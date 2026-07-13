@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Belajar SQL dari Nol — Sepelan Ngajarin Bayi Ngomong</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EFF3EE;
+    --card: #FFFFFF;
+    --ink: #1E2A22;
+    --ink-soft: #526056;
+    --border: #DCE5DD;
+    --forest: #2F6B4F;
+    --forest-dark: #23543D;
+    --amber: #E8A33D;
+    --amber-soft: #FCEED8;
+    --blue: #3A6EA5;
+    --blue-soft: #E4EEF8;
+    --pink: #D9637A;
+    --pink-soft: #FBE6EA;
+    --code-bg: #1E2A22;
+    --code-ink: #E9F1EA;
+    --radius: 18px;
+    --shadow: 0 6px 20px rgba(30,42,34,0.06);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Plus Jakarta Sans', sans-serif; line-height:1.7; font-size:16px;
+  }
+  h1,h2,h3,.display{ font-family:'Baloo 2', sans-serif; color:var(--forest-dark); line-height:1.25; }
+  a{ color:var(--forest); }
+  code, pre, .mono{ font-family:'JetBrains Mono', monospace; }
+
+  .shell{ display:grid; grid-template-columns: 270px 1fr; max-width:1240px; margin:0 auto; gap:0; }
+  @media (max-width: 900px){ .shell{ grid-template-columns: 1fr; } }
+
+  .sidebar{
+    position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+    padding:22px 14px 40px 22px; border-right:1px solid var(--border); scrollbar-width:thin;
+  }
+  @media (max-width: 900px){
+    .sidebar{ position:relative; height:auto; border-right:none; border-bottom:1px solid var(--border); padding:16px; }
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px; font-family:'Baloo 2', sans-serif;
+    font-weight:800; font-size:1.05rem; color:var(--forest-dark); margin-bottom:20px; padding:0 6px;
+  }
+  .brand .dot{
+    width:34px; height:34px; border-radius:10px; background:var(--forest); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex:none;
+  }
+  nav.toc{ display:flex; flex-direction:column; gap:2px; }
+  nav.toc .grp-label{
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--ink-soft); font-weight:700; margin:16px 8px 6px;
+  }
+  nav.toc .grp-label:first-child{ margin-top:4px; }
+  nav.toc a{
+    text-decoration:none; color:var(--ink-soft); padding:8px 10px; border-radius:10px;
+    font-size:0.92rem; display:flex; align-items:center; gap:8px; transition:background .15s, color .15s;
+  }
+  nav.toc a .num{ font-family:'JetBrains Mono', monospace; font-size:0.75rem; color:var(--forest); width:22px; flex:none; }
+  nav.toc a:hover{ background:var(--amber-soft); color:var(--forest-dark); }
+  nav.toc a.active{ background:var(--forest); color:#fff; font-weight:600; }
+  nav.toc a.active .num{ color:#fff; }
+
+  main{ padding:0 26px 100px; min-width:0; }
+  .hero{
+    margin-top:26px; background: linear-gradient(160deg, var(--forest-dark), var(--forest) 60%, #3d8262);
+    border-radius: 24px; padding:44px 38px; color:#F4FBF6; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px;
+    border-radius:50%; background:rgba(232,163,61,0.25);
+  }
+  .hero .kicker{
+    display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.14);
+    padding:6px 14px; border-radius:999px; font-size:0.8rem; font-weight:600; letter-spacing:0.03em; margin-bottom:18px;
+  }
+  .hero h1{ color:#fff; font-size:2.2rem; margin:0 0 14px; max-width:620px; }
+  .hero p{ max-width:580px; color:#E4F1E8; font-size:1.02rem; position:relative; }
+
+  section.lesson{
+    background:var(--card); border:1px solid var(--border); border-radius: var(--radius);
+    padding:34px 36px; margin-top:26px; box-shadow: var(--shadow); scroll-margin-top: 20px;
+  }
+  @media (max-width: 600px){
+    section.lesson{ padding:24px 20px; } .hero{ padding:30px 22px; } .hero h1{ font-size:1.6rem; }
+  }
+  section.lesson .eyebrow{ font-size:0.78rem; font-weight:700; color:var(--forest); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+  section.lesson h2{ font-size:1.5rem; margin:0 0 6px; }
+  section.lesson .subtitle{ color:var(--ink-soft); margin-bottom:22px; font-size:0.98rem; }
+  section.lesson h3{ font-size:1.05rem; margin:24px 0 10px; }
+  section.lesson p{ margin:10px 0; color:#33403A; }
+  section.lesson ul, section.lesson ol{ color:#33403A; padding-left:22px; }
+  section.lesson li{ margin:6px 0; }
+
+  .box{ border-radius:14px; padding:16px 18px; margin:18px 0; border:1px solid transparent; font-size:0.95rem; }
+  .box .box-title{ font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:6px; font-family:'Baloo 2',sans-serif; }
+  .box.analogi{ background:var(--amber-soft); border-color:#F2D6A3; }
+  .box.analogi .box-title{ color:#8A5E13; }
+  .box.tip{ background:var(--blue-soft); border-color:#C6DBEE; }
+  .box.tip .box-title{ color:var(--blue); }
+  .box.awas{ background:var(--pink-soft); border-color:#F1C3CE; }
+  .box.awas .box-title{ color:#9E3A50; }
+  .box.hasil{ background:#EEF7F0; border-color:#CBE6D3; }
+  .box.hasil .box-title{ color:var(--forest-dark); }
+
+  .codewrap{ margin:16px 0; border-radius:14px; overflow:hidden; border:1px solid #10190F; }
+  .codebar{
+    background:#16211A; color:#9FC7AE; font-size:0.75rem; padding:8px 14px;
+    display:flex; align-items:center; justify-content:space-between; font-family:'JetBrains Mono', monospace;
+  }
+  .codebar .dots{ display:flex; gap:6px; }
+  .codebar .dots span{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .codebar .dots span:nth-child(1){ background:#E8746C; }
+  .codebar .dots span:nth-child(2){ background:#E8C94C; }
+  .codebar .dots span:nth-child(3){ background:#79C46E; }
+  pre{ background:var(--code-bg); color:var(--code-ink); margin:0; padding:18px 20px; overflow-x:auto; font-size:0.87rem; line-height:1.65; }
+  pre code{ font-family:'JetBrains Mono', monospace; }
+  .kw{ color:#79C4E8; } .str{ color:#B7E89A; } .col{ color:#F2A6C5; }
+  .cmt{ color:#7C8C81; font-style:italic; } .fn{ color:#F2D06B; } .num{ color:#E39B4E; }
+
+  .steps{ display:grid; gap:14px; margin:16px 0; }
+  .step{ display:flex; gap:14px; padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:#FBFCFA; }
+  .step .n{
+    flex:none; width:30px; height:30px; border-radius:50%; background:var(--forest); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:0.9rem;
+  }
+
+  table.tbl{ width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; }
+  table.tbl th, table.tbl td{ border:1px solid var(--border); padding:10px 12px; text-align:left; }
+  table.tbl th{ background:#F4F8F4; color:var(--forest-dark); font-family:'Baloo 2',sans-serif; }
+  table.tbl code{ background:#EFF3EE; padding:1px 6px; border-radius:6px; }
+
+  .datatbl{ width:100%; border-collapse:collapse; margin:14px 0; font-size:0.88rem; }
+  .datatbl th, .datatbl td{ border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  .datatbl th{ background:var(--forest); color:#fff; font-family:'JetBrains Mono',monospace; font-size:0.78rem; }
+  .datatbl td{ font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+  .datatbl tr:nth-child(even) td{ background:#F7FAF7; }
+
+  .lesson-nav{ display:flex; justify-content:space-between; gap:12px; margin-top:14px; flex-wrap:wrap;}
+  .lesson-nav a{ text-decoration:none; font-size:0.85rem; color:var(--forest); font-weight:600; background:var(--amber-soft); padding:8px 14px; border-radius:999px; }
+
+  footer{ text-align:center; color:var(--ink-soft); font-size:0.85rem; padding:40px 20px 10px; }
+  ::-webkit-scrollbar{ width:9px; }
+  ::-webkit-scrollbar-thumb{ background:#C7D6CB; border-radius:10px; }
+  .mascot{
+    display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+    border-radius:50%; background:var(--forest); color:#fff; font-size:12px; flex:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="dot">🗄️</span> Belajar SQL Santai</div>
+    <nav class="toc" id="toc">
+      <div class="grp-label">Mulai dari sini</div>
+      <a href="#beranda"><span class="num">00</span> Halo dulu ya</a>
+      <a href="#apa-itu-sql"><span class="num">01</span> Apa itu SQL?</a>
+      <a href="#tabel"><span class="num">02</span> Tabel &amp; kolom</a>
+      <a href="#bikin-tabel"><span class="num">03</span> Bikin tabel (CREATE)</a>
+
+      <div class="grp-label">Isi &amp; lihat data</div>
+      <a href="#insert"><span class="num">04</span> Masukin data (INSERT)</a>
+      <a href="#select"><span class="num">05</span> Lihat data (SELECT)</a>
+      <a href="#where"><span class="num">06</span> Filter data (WHERE)</a>
+      <a href="#urut-batas"><span class="num">07</span> Urutkan &amp; batasi</a>
+
+      <div class="grp-label">Ubah &amp; hapus</div>
+      <a href="#update"><span class="num">08</span> Ubah data (UPDATE)</a>
+      <a href="#delete"><span class="num">09</span> Hapus data (DELETE)</a>
+
+      <div class="grp-label">Naik level dikit</div>
+      <a href="#filter-lanjut"><span class="num">10</span> Filter yang lebih pintar</a>
+      <a href="#agregat"><span class="num">11</span> Hitung-hitungan (agregat)</a>
+      <a href="#relasi"><span class="num">12</span> Kunci &amp; hubungan tabel</a>
+      <a href="#join"><span class="num">13</span> Gabungin tabel (JOIN)</a>
+
+      <div class="grp-label">Praktik &amp; penutup</div>
+      <a href="#studi-kasus"><span class="num">14</span> Studi kasus: Toko Kecil</a>
+      <a href="#penutup"><span class="num">15</span> Lanjut ke mana?</a>
+    </nav>
+  </aside>
+
+  <main>
+
+    <section class="hero" id="beranda">
+      <span class="kicker">🍼 Level: Bener-bener dari NOL</span>
+      <h1>Belajar SQL, sepelan ngajarin bayi ngomong kata pertama.</h1>
+      <p>SQL itu bukan bahasa buat bikin tampilan, tapi bahasa buat <b>ngobrol sama
+      database</b> — nanya, nyuruh nyimpen, nyuruh ubah, nyuruh hapus data. Kalau kamu
+      sudah ikutin seri belajar PHP sebelumnya, beberapa kata di sini bakal terasa
+      familiar. Kita bahas satu-satu, pelan-pelan, sampai kamu bisa "ngobrol" lancar
+      sama database sendiri. 🐢</p>
+    </section>
+
+    <!-- 01 -->
+    <section class="lesson" id="apa-itu-sql">
+      <div class="eyebrow">Bab 01</div>
+      <h2>Apa itu SQL? 🤔</h2>
+      <p class="subtitle">Sebelum ngobrol sama database, kenalan dulu sama bahasanya.</p>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🗣️</span> Bayangin gini</div>
+        Database itu kayak <b>petugas gudang arsip raksasa</b> yang nyimpen jutaan
+        data rapi-rapi. Masalahnya, petugas ini cuma ngerti satu bahasa khusus. Nah,
+        <b>SQL (Structured Query Language)</b> adalah <b>bahasa itu</b> — cara kamu
+        "ngomong" ke petugas gudang: "tolong ambilkan data ini", "tolong simpan data
+        baru ini", "tolong buang data yang itu".
+      </div>
+
+      <p>SQL dipakai untuk empat hal utama, yang nanti bakal jadi sahabat karibmu:</p>
+      <table class="tbl">
+        <tr><th>Perintah</th><th>Artinya</th></tr>
+        <tr><td><code>SELECT</code></td><td>"Tolong ambilkan / tampilkan data ini"</td></tr>
+        <tr><td><code>INSERT</code></td><td>"Tolong simpan data baru ini"</td></tr>
+        <tr><td><code>UPDATE</code></td><td>"Tolong ubah data yang ini"</td></tr>
+        <tr><td><code>DELETE</code></td><td>"Tolong buang data yang ini"</td></tr>
+      </table>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        Kalau kamu sudah pernah bikin tabel <code>siswa</code> di seri belajar PHP
+        sebelumnya lewat phpMyAdmin, kamu sebenarnya <b>sudah</b> pernah pakai SQL —
+        cuma waktu itu belum dijelasin detail. Sekarang kita bongkar pelan-pelan.
+      </div>
+
+      <p>Kamu bisa coba semua kode di halaman ini lewat <b>phpMyAdmin</b> (buka
+      <code>http://localhost/phpmyadmin</code>, pilih database, klik tab <b>SQL</b>,
+      tempel kodenya, klik "Go").</p>
+
+      <div class="lesson-nav"><span></span><a href="#tabel">Lanjut: Tabel &amp; kolom →</a></div>
+    </section>
+
+    <!-- 02 -->
+    <section class="lesson" id="tabel">
+      <div class="eyebrow">Bab 02</div>
+      <h2>Tabel &amp; kolom — kayak Excel, tapi lebih rapi 📊</h2>
+      <p class="subtitle">Sebelum ngobrol, pahami dulu bentuk "kamarnya".</p>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">📊</span> Bayangin gini</div>
+        Database itu <b>lemari besar</b>. Di dalamnya ada beberapa <b>laci</b>
+        (disebut <b>tabel</b>). Tiap laci punya <b>kolom-kolom</b> tetap (nama, umur,
+        kelas), dan tiap kali kamu masukin satu data baru, itu jadi satu <b>baris</b>
+        baru di laci itu — persis kayak spreadsheet Excel.
+      </div>
+
+      <p>Contoh tabel bernama <code>siswa</code>:</p>
+      <table class="datatbl">
+        <tr><th>id</th><th>nama</th><th>kelas</th><th>nilai</th></tr>
+        <tr><td>1</td><td>Budi</td><td>XII RPL</td><td>88.5</td></tr>
+        <tr><td>2</td><td>Sinta</td><td>XI TKJ</td><td>92.0</td></tr>
+      </table>
+
+      <ul>
+        <li><b>Tabel</b>: <code>siswa</code> — laci penyimpanan data siswa.</li>
+        <li><b>Kolom</b>: <code>id</code>, <code>nama</code>, <code>kelas</code>,
+        <code>nilai</code> — jenis informasi yang disimpan tiap siswa.</li>
+        <li><b>Baris</b>: tiap 1 baris = data 1 siswa.</li>
+      </ul>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        Satu database bisa punya banyak tabel sekaligus — misalnya database toko
+        bisa punya tabel <code>produk</code>, <code>pelanggan</code>, dan
+        <code>transaksi</code> secara bersamaan.
+      </div>
+
+      <div class="lesson-nav"><a href="#apa-itu-sql">← Balik: Apa itu SQL?</a><a href="#bikin-tabel">Lanjut: Bikin tabel →</a></div>
+    </section>
+
+    <!-- 03 -->
+    <section class="lesson" id="bikin-tabel">
+      <div class="eyebrow">Bab 03</div>
+      <h2>Bikin tabel pertamamu (CREATE TABLE) 🧱</h2>
+      <p class="subtitle">Nyusun laci kosong sebelum diisi barang.</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>bikin-tabel.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">CREATE TABLE</span> siswa (
+  id <span class="kw">INT</span> <span class="kw">AUTO_INCREMENT</span> <span class="kw">PRIMARY KEY</span>,
+  nama <span class="kw">VARCHAR</span>(<span class="num">100</span>),
+  kelas <span class="kw">VARCHAR</span>(<span class="num">50</span>),
+  nilai <span class="kw">FLOAT</span>
+);</code></pre>
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🔧</span> Pelan-pelan kita bedah</div>
+        <ul style="margin:6px 0 0;">
+          <li><code>CREATE TABLE siswa</code> artinya "buatkan laci baru bernama siswa".</li>
+          <li>Di dalam kurung, tiap baris adalah satu kolom: nama kolom, lalu
+          jenis datanya.</li>
+          <li><code>id INT AUTO_INCREMENT PRIMARY KEY</code>: kolom <code>id</code>
+          berisi angka, otomatis nambah sendiri, dan jadi "nomor identitas unik" tiap
+          baris — nggak akan ada dua siswa dengan id yang sama.</li>
+          <li><code>VARCHAR(100)</code>: kolom tulisan, maksimal 100 huruf.</li>
+          <li><code>FLOAT</code>: kolom angka desimal.</li>
+        </ul>
+      </div>
+
+      <table class="tbl">
+        <tr><th>Tipe data</th><th>Buat nyimpen apa</th></tr>
+        <tr><td><code>INT</code></td><td>Angka bulat (1, 2, 100, dst)</td></tr>
+        <tr><td><code>FLOAT</code> / <code>DECIMAL</code></td><td>Angka desimal (88.5, 12.75)</td></tr>
+        <tr><td><code>VARCHAR(n)</code></td><td>Tulisan pendek, maksimal <code>n</code> huruf</td></tr>
+        <tr><td><code>TEXT</code></td><td>Tulisan panjang, tanpa batas ketat</td></tr>
+        <tr><td><code>DATE</code></td><td>Tanggal (contoh: 2026-07-13)</td></tr>
+        <tr><td><code>BOOLEAN</code></td><td>Benar / salah (1 atau 0)</td></tr>
+      </table>
+
+      <div class="box awas">
+        <div class="box-title"><span class="mascot">⚠️</span> Jangan lupa titik koma</div>
+        Hampir setiap perintah SQL diakhiri tanda titik koma <code>;</code> — kayak
+        titik di akhir kalimat. Kadang boleh kelupaan (SQL cukup toleran), tapi
+        biasakan nulis biar rapi dan nggak bingung sendiri nanti.
+      </div>
+
+      <div class="lesson-nav"><a href="#tabel">← Balik: Tabel &amp; kolom</a><a href="#insert">Lanjut: Masukin data →</a></div>
+    </section>
+
+    <!-- 04 -->
+    <section class="lesson" id="insert">
+      <div class="eyebrow">Bab 04</div>
+      <h2>Masukin data baru (INSERT) 📥</h2>
+      <p class="subtitle">Sekarang laci kosong tadi mau kita isi barang.</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>insert.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">INSERT INTO</span> siswa (nama, kelas, nilai)
+<span class="kw">VALUES</span> (<span class="str">'Budi Santoso'</span>, <span class="str">'XII RPL'</span>, <span class="num">88.5</span>);</code></pre>
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">📦</span> Pelan-pelan kita bedah</div>
+        <ul style="margin:6px 0 0;">
+          <li><code>INSERT INTO siswa</code> artinya "masukkan ke laci siswa".</li>
+          <li><code>(nama, kelas, nilai)</code>: kolom mana saja yang mau diisi
+          (kolom <code>id</code> nggak perlu ditulis, karena otomatis terisi sendiri).</li>
+          <li><code>VALUES (...)</code>: nilai yang mau dimasukkan, urutannya harus
+          sama persis dengan urutan kolom di atas.</li>
+          <li>Tulisan diapit tanda kutip satu <code>' '</code>, angka tidak perlu
+          tanda kutip.</li>
+        </ul>
+      </div>
+
+      <p>Mau masukin beberapa data sekaligus? Bisa banget:</p>
+      <div class="codewrap">
+        <div class="codebar"><span>insert-banyak.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">INSERT INTO</span> siswa (nama, kelas, nilai) <span class="kw">VALUES</span>
+(<span class="str">'Sinta Dewi'</span>, <span class="str">'XI TKJ'</span>, <span class="num">92.0</span>),
+(<span class="str">'Doni Pratama'</span>, <span class="str">'X MM'</span>, <span class="num">79.0</span>);</code></pre>
+      </div>
+
+      <div class="lesson-nav"><a href="#bikin-tabel">← Balik: Bikin tabel</a><a href="#select">Lanjut: Lihat data →</a></div>
+    </section>
+
+    <!-- 05 -->
+    <section class="lesson" id="select">
+      <div class="eyebrow">Bab 05</div>
+      <h2>Lihat data (SELECT) 👀</h2>
+      <p class="subtitle">Perintah yang paling sering kamu pakai, sesering kamu bernapas.</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>select.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa;</code></pre>
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">👀</span> Pelan-pelan kita bedah</div>
+        <code>SELECT * FROM siswa</code> artinya "ambil <b>semua kolom</b> (tanda
+        bintang <code>*</code> artinya "semua"), dari laci <code>siswa</code>".
+        Hasilnya adalah semua baris data siswa, dengan semua kolomnya.
+      </div>
+
+      <p>Kalau cuma butuh kolom tertentu saja, sebutkan namanya:</p>
+      <div class="codewrap">
+        <div class="codebar"><span>select-kolom.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> nama, nilai <span class="kw">FROM</span> siswa;</code></pre>
+      </div>
+
+      <div class="box hasil">
+        <div class="box-title"><span class="mascot">✅</span> Hasilnya</div>
+        <table class="datatbl">
+          <tr><th>nama</th><th>nilai</th></tr>
+          <tr><td>Budi Santoso</td><td>88.5</td></tr>
+          <tr><td>Sinta Dewi</td><td>92.0</td></tr>
+          <tr><td>Doni Pratama</td><td>79.0</td></tr>
+        </table>
+      </div>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        Kebiasaan yang baik: jangan selalu pakai <code>*</code> kalau nggak semua
+        kolom dibutuhkan. Selain hasilnya lebih rapi, ini juga bikin database kerja
+        lebih ringan karena nggak perlu ambil data yang nggak dipakai.
+      </div>
+
+      <div class="lesson-nav"><a href="#insert">← Balik: Masukin data</a><a href="#where">Lanjut: Filter data →</a></div>
+    </section>
+
+    <!-- 06 -->
+    <section class="lesson" id="where">
+      <div class="eyebrow">Bab 06</div>
+      <h2>Filter data pakai WHERE 🔍</h2>
+      <p class="subtitle">Biar nggak semua data ikut kebawa, cuma yang kamu mau aja.</p>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🔍</span> Bayangin gini</div>
+        Kalau <code>SELECT</code> tanpa <code>WHERE</code> itu kayak nyuruh petugas
+        gudang "ambil <b>semua</b> barang di laci ini", <code>WHERE</code> itu kayak
+        nambahin syarat: "ambil <b>yang ini aja</b>, yang cocok sama syarat tertentu".
+      </div>
+
+      <div class="codewrap">
+        <div class="codebar"><span>where.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> kelas = <span class="str">'XII RPL'</span>;</code></pre>
+      </div>
+
+      <p>Bisa juga pakai operator perbandingan buat angka:</p>
+      <div class="codewrap">
+        <div class="codebar"><span>where-angka.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> nilai &gt;= <span class="num">85</span>;</code></pre>
+      </div>
+
+      <table class="tbl">
+        <tr><th>Operator</th><th>Artinya</th></tr>
+        <tr><td><code>=</code></td><td>Sama dengan</td></tr>
+        <tr><td><code>!=</code> atau <code>&lt;&gt;</code></td><td>Tidak sama dengan</td></tr>
+        <tr><td><code>&gt;</code> / <code>&lt;</code></td><td>Lebih besar / lebih kecil</td></tr>
+        <tr><td><code>&gt;=</code> / <code>&lt;=</code></td><td>Lebih besar sama dengan / lebih kecil sama dengan</td></tr>
+      </table>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        <code>WHERE</code> juga dipakai di <code>UPDATE</code> dan <code>DELETE</code>
+        nanti — dan di situ, <code>WHERE</code> jadi <b>sangat penting</b>. Lupa
+        nulis <code>WHERE</code> saat hapus data bisa berakibat semua data terhapus.
+        Nanti kita bahas lebih detail.
+      </div>
+
+      <div class="lesson-nav"><a href="#select">← Balik: Lihat data</a><a href="#urut-batas">Lanjut: Urutkan &amp; batasi →</a></div>
+    </section>
+
+    <!-- 07 -->
+    <section class="lesson" id="urut-batas">
+      <div class="eyebrow">Bab 07</div>
+      <h2>Urutkan (ORDER BY) &amp; batasi (LIMIT) 📐</h2>
+      <p class="subtitle">Biar data ditampilkan rapi dan nggak kepanjangan.</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>order-limit.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa
+<span class="kw">ORDER BY</span> nilai <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">2</span>;</code></pre>
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">📐</span> Pelan-pelan kita bedah</div>
+        <ul style="margin:6px 0 0;">
+          <li><code>ORDER BY nilai</code>: urutkan hasilnya berdasarkan kolom nilai.</li>
+          <li><code>DESC</code> (descending) artinya dari <b>besar ke kecil</b>. Kalau
+          mau dari kecil ke besar, pakai <code>ASC</code> (ascending) — atau tidak
+          usah ditulis sama sekali, karena <code>ASC</code> itu default-nya.</li>
+          <li><code>LIMIT 2</code>: cuma tampilkan <b>2 baris teratas</b> saja dari
+          hasilnya. Cocok banget buat, misalnya, "tampilkan 2 siswa dengan nilai
+          tertinggi".</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        Urutan penulisan klausa SQL itu penting: <code>SELECT ... FROM ... WHERE ...
+        ORDER BY ... LIMIT ...</code>. Kalau dibolak-balik urutannya, SQL akan error.
+      </div>
+
+      <div class="lesson-nav"><a href="#where">← Balik: Filter data</a><a href="#update">Lanjut: Ubah data →</a></div>
+    </section>
+
+    <!-- 08 -->
+    <section class="lesson" id="update">
+      <div class="eyebrow">Bab 08</div>
+      <h2>Ubah data (UPDATE) ✏️</h2>
+      <p class="subtitle">Data lama boleh berubah, nggak selamanya harus dihapus terus dibikin ulang.</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>update.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">UPDATE</span> siswa
+<span class="kw">SET</span> nilai = <span class="num">95.0</span>
+<span class="kw">WHERE</span> nama = <span class="str">'Budi Santoso'</span>;</code></pre>
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">✏️</span> Pelan-pelan kita bedah</div>
+        <ul style="margin:6px 0 0;">
+          <li><code>UPDATE siswa</code>: "yang mau diubah ada di laci siswa".</li>
+          <li><code>SET nilai = 95.0</code>: "ubah kolom nilai jadi 95.0".</li>
+          <li><code>WHERE nama = 'Budi Santoso'</code>: "tapi cuma buat baris yang
+          namanya Budi Santoso aja".</li>
+        </ul>
+      </div>
+
+      <div class="box awas">
+        <div class="box-title"><span class="mascot">🚨</span> INI PALING PENTING DI SELURUH SQL</div>
+        Kalau kamu tulis <code>UPDATE siswa SET nilai = 95.0;</code> <b>tanpa</b>
+        <code>WHERE</code>, maka <b>SEMUA</b> baris di tabel siswa nilainya berubah
+        jadi 95.0 — bukan cuma satu siswa. Selalu double-check bagian
+        <code>WHERE</code> sebelum menjalankan perintah <code>UPDATE</code>.
+      </div>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        Kebiasaan aman: coba dulu pakai <code>SELECT * FROM siswa WHERE nama =
+        'Budi Santoso'</code> untuk lihat data mana yang bakal kena — kalau hasilnya
+        sudah benar (cuma 1 baris yang dimaksud), baru ganti <code>SELECT *</code>
+        jadi <code>UPDATE ... SET ...</code>.
+      </div>
+
+      <div class="lesson-nav"><a href="#urut-batas">← Balik: Urutkan &amp; batasi</a><a href="#delete">Lanjut: Hapus data →</a></div>
+    </section>
+
+    <!-- 09 -->
+    <section class="lesson" id="delete">
+      <div class="eyebrow">Bab 09</div>
+      <h2>Hapus data (DELETE) 🗑️</h2>
+      <p class="subtitle">Perintah paling pendek, tapi paling perlu hati-hati sedunia.</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>delete.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">DELETE FROM</span> siswa
+<span class="kw">WHERE</span> nama = <span class="str">'Doni Pratama'</span>;</code></pre>
+      </div>
+
+      <div class="box awas">
+        <div class="box-title"><span class="mascot">🚨</span> Sekali lagi, jangan lupa WHERE</div>
+        <code>DELETE FROM siswa;</code> tanpa <code>WHERE</code> akan menghapus
+        <b>SELURUH</b> data di tabel siswa, dan itu <b>tidak bisa dibatalkan</b>
+        kecuali kamu punya backup. Ini kesalahan klasik yang bikin banyak pemula
+        (bahkan yang sudah kerja beberapa tahun!) panik mendadak. Selalu cek
+        <code>WHERE</code>-nya dua kali sebelum tekan enter.
+      </div>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        Sama seperti <code>UPDATE</code>, biasakan cek dulu pakai <code>SELECT</code>
+        dengan <code>WHERE</code> yang sama, pastikan yang muncul memang cuma data
+        yang mau dihapus, baru ganti jadi <code>DELETE FROM</code>.
+      </div>
+
+      <div class="lesson-nav"><a href="#update">← Balik: Ubah data</a><a href="#filter-lanjut">Lanjut: Filter lebih pintar →</a></div>
+    </section>
+
+    <!-- 10 -->
+    <section class="lesson" id="filter-lanjut">
+      <div class="eyebrow">Bab 10</div>
+      <h2>Filter yang lebih pintar (AND, OR, LIKE, IN, BETWEEN) 🧠</h2>
+      <p class="subtitle">WHERE dasar sudah oke, sekarang bikin dia lebih jago.</p>
+
+      <table class="tbl">
+        <tr><th>Kata kunci</th><th>Gunanya</th><th>Contoh</th></tr>
+        <tr><td><code>AND</code></td><td>Semua syarat harus terpenuhi</td><td><code>WHERE kelas='XII RPL' AND nilai&gt;85</code></td></tr>
+        <tr><td><code>OR</code></td><td>Salah satu syarat cukup</td><td><code>WHERE kelas='X MM' OR kelas='XI TKJ'</code></td></tr>
+        <tr><td><code>LIKE</code></td><td>Cari yang mirip / mengandung teks</td><td><code>WHERE nama LIKE '%budi%'</code></td></tr>
+        <tr><td><code>IN</code></td><td>Cocok dengan salah satu dari daftar</td><td><code>WHERE kelas IN ('X MM','XI TKJ')</code></td></tr>
+        <tr><td><code>BETWEEN</code></td><td>Ada di antara dua nilai</td><td><code>WHERE nilai BETWEEN 80 AND 90</code></td></tr>
+      </table>
+
+      <div class="codewrap">
+        <div class="codebar"><span>filter-lanjut.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="cmt">-- cari siswa yang namanya mengandung kata "budi"</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> siswa <span class="kw">WHERE</span> nama <span class="kw">LIKE</span> <span class="str">'%budi%'</span>;</code></pre>
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🔎</span> Soal si tanda persen <code>%</code></div>
+        Di <code>LIKE</code>, tanda <code>%</code> artinya "apapun boleh ada di
+        sini". Jadi <code>'%budi%'</code> artinya "ada tulisan 'budi' di mana pun
+        posisinya", <code>'budi%'</code> artinya "harus diawali 'budi'", dan
+        <code>'%budi'</code> artinya "harus diakhiri 'budi'".
+      </div>
+
+      <div class="lesson-nav"><a href="#delete">← Balik: Hapus data</a><a href="#agregat">Lanjut: Hitung-hitungan →</a></div>
+    </section>
+
+    <!-- 11 -->
+    <section class="lesson" id="agregat">
+      <div class="eyebrow">Bab 11</div>
+      <h2>Hitung-hitungan otomatis (fungsi agregat) 🧮</h2>
+      <p class="subtitle">Biar nggak perlu hitung manual satu-satu.</p>
+
+      <table class="tbl">
+        <tr><th>Fungsi</th><th>Gunanya</th></tr>
+        <tr><td><code>COUNT()</code></td><td>Menghitung jumlah baris</td></tr>
+        <tr><td><code>SUM()</code></td><td>Menjumlahkan semua nilai di satu kolom</td></tr>
+        <tr><td><code>AVG()</code></td><td>Menghitung rata-rata</td></tr>
+        <tr><td><code>MAX()</code></td><td>Mencari nilai tertinggi</td></tr>
+        <tr><td><code>MIN()</code></td><td>Mencari nilai terendah</td></tr>
+      </table>
+
+      <div class="codewrap">
+        <div class="codebar"><span>agregat.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> COUNT(*) <span class="kw">AS</span> jumlah_siswa, AVG(nilai) <span class="kw">AS</span> rata_rata
+<span class="kw">FROM</span> siswa;</code></pre>
+      </div>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        <code>AS</code> dipakai buat kasih "nama panggilan" pada hasil, biar lebih
+        gampang dibaca — <code>COUNT(*) AS jumlah_siswa</code> artinya "hasil hitungan
+        ini, tampilkan dengan nama kolom jumlah_siswa".
+      </div>
+
+      <p>Kalau mau menghitung per kelompok (misalnya rata-rata nilai <b>per kelas</b>),
+      pakai <code>GROUP BY</code>:</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>group-by.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> kelas, AVG(nilai) <span class="kw">AS</span> rata_rata
+<span class="kw">FROM</span> siswa
+<span class="kw">GROUP BY</span> kelas;</code></pre>
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🗂️</span> Bayangin gini</div>
+        <code>GROUP BY kelas</code> itu kayak <b>menyortir siswa ke tumpukan-tumpukan
+        terpisah</b> berdasarkan kelasnya dulu, baru dihitung rata-rata di
+        masing-masing tumpukan secara terpisah — bukan dicampur jadi satu rata-rata besar.
+      </div>
+
+      <div class="lesson-nav"><a href="#filter-lanjut">← Balik: Filter lebih pintar</a><a href="#relasi">Lanjut: Kunci &amp; hubungan →</a></div>
+    </section>
+
+    <!-- 12 -->
+    <section class="lesson" id="relasi">
+      <div class="eyebrow">Bab 12</div>
+      <h2>Primary Key &amp; Foreign Key — cara tabel saling kenal 🔑</h2>
+      <p class="subtitle">Konsep penting sebelum belajar menggabungkan tabel.</p>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🪪</span> Bayangin gini</div>
+        <b>Primary Key</b> itu kayak <b>Nomor Induk Siswa (NIS)</b> — nomor unik yang
+        nggak mungkin sama antara satu siswa dengan siswa lain, dan jadi "identitas
+        resmi" tiap baris data.
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🔗</span> Bayangin gini (lanjutan)</div>
+        <b>Foreign Key</b> itu kayak <b>nomor NIS yang dicatat ulang di buku
+        perpustakaan</b> saat siswa pinjam buku. Nomor itu "menunjuk balik" ke data
+        siswa yang lengkap di tabel siswa, tanpa perlu menulis ulang nama, kelas,
+        dsb di buku peminjaman. Ini yang bikin dua tabel bisa "saling kenal".
+      </div>
+
+      <p>Contoh: dua tabel yang berhubungan.</p>
+      <div class="codewrap">
+        <div class="codebar"><span>relasi.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">CREATE TABLE</span> siswa (
+  id <span class="kw">INT</span> <span class="kw">AUTO_INCREMENT</span> <span class="kw">PRIMARY KEY</span>,
+  nama <span class="kw">VARCHAR</span>(<span class="num">100</span>)
+);
+
+<span class="kw">CREATE TABLE</span> peminjaman (
+  id <span class="kw">INT</span> <span class="kw">AUTO_INCREMENT</span> <span class="kw">PRIMARY KEY</span>,
+  siswa_id <span class="kw">INT</span>,           <span class="cmt">-- ini foreign key</span>
+  judul_buku <span class="kw">VARCHAR</span>(<span class="num">150</span>),
+  <span class="kw">FOREIGN KEY</span> (siswa_id) <span class="kw">REFERENCES</span> siswa(id)
+);</code></pre>
+      </div>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        Kolom <code>siswa_id</code> di tabel <code>peminjaman</code> cuma nyimpen
+        <b>angka</b> (misalnya 1), yang menunjuk ke siswa dengan <code>id = 1</code>
+        di tabel <code>siswa</code>. Ini jauh lebih hemat dan rapi dibanding menulis
+        ulang nama &amp; kelas siswa di setiap baris peminjaman.
+      </div>
+
+      <div class="lesson-nav"><a href="#agregat">← Balik: Hitung-hitungan</a><a href="#join">Lanjut: Gabungin tabel →</a></div>
+    </section>
+
+    <!-- 13 -->
+    <section class="lesson" id="join">
+      <div class="eyebrow">Bab 13</div>
+      <h2>Menggabungkan tabel (JOIN) 🧩</h2>
+      <p class="subtitle">Setelah dua laci "saling kenal", sekarang kita lihat isinya bareng-bareng.</p>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🧩</span> Bayangin gini</div>
+        Kalau tabel <code>peminjaman</code> cuma nyimpen <code>siswa_id</code>
+        (angka doang), itu nggak enak dibaca manusia. <code>JOIN</code> itu kayak
+        <b>menyatukan dua lembar kertas terpisah jadi satu tampilan</b>: data
+        peminjaman digabung dengan data siswa aslinya, biar yang muncul nama siswa,
+        bukan cuma angka id.
+      </div>
+
+      <div class="codewrap">
+        <div class="codebar"><span>join.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> siswa.nama, peminjaman.judul_buku
+<span class="kw">FROM</span> peminjaman
+<span class="kw">JOIN</span> siswa <span class="kw">ON</span> peminjaman.siswa_id = siswa.id;</code></pre>
+      </div>
+
+      <div class="box analogi">
+        <div class="box-title"><span class="mascot">🔍</span> Pelan-pelan kita bedah</div>
+        <ul style="margin:6px 0 0;">
+          <li><code>FROM peminjaman</code>: mulai dari tabel peminjaman.</li>
+          <li><code>JOIN siswa</code>: gabungkan dengan tabel siswa.</li>
+          <li><code>ON peminjaman.siswa_id = siswa.id</code>: "caranya gabungin,
+          cocokkan kolom siswa_id di peminjaman dengan kolom id di siswa" — ini
+          aturan yang bilang baris mana harus disatukan dengan baris mana.</li>
+          <li>Hasilnya: satu tabel gabungan yang langsung nampilin nama siswa
+          <b>dan</b> judul buku yang dipinjam dalam satu baris, tanpa perlu lihat
+          angka id sama sekali.</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💡</span> Kata Kak SQL</div>
+        <code>JOIN</code> ini salah satu skill SQL paling powerful. Hampir semua
+        sistem informasi beneran (seperti project Sistem Informasi Data Siswa yang
+        pernah kamu bikin) akan butuh <code>JOIN</code> begitu datanya sudah
+        dipecah jadi beberapa tabel berhubungan.
+      </div>
+
+      <div class="lesson-nav"><a href="#relasi">← Balik: Kunci &amp; hubungan</a><a href="#studi-kasus">Lanjut: Studi kasus →</a></div>
+    </section>
+
+    <!-- 14 -->
+    <section class="lesson" id="studi-kasus">
+      <div class="eyebrow">Bab 14</div>
+      <h2>Studi kasus: Database Toko Kecil 🏪</h2>
+      <p class="subtitle">Gabungin semua yang sudah dipelajari jadi satu database mini yang nyata.</p>
+
+      <p>Kita bikin database toko kecil dengan dua tabel: <code>produk</code> dan
+      <code>penjualan</code>.</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>toko.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">CREATE TABLE</span> produk (
+  id <span class="kw">INT</span> <span class="kw">AUTO_INCREMENT</span> <span class="kw">PRIMARY KEY</span>,
+  nama_produk <span class="kw">VARCHAR</span>(<span class="num">100</span>),
+  harga <span class="kw">INT</span>
+);
+
+<span class="kw">CREATE TABLE</span> penjualan (
+  id <span class="kw">INT</span> <span class="kw">AUTO_INCREMENT</span> <span class="kw">PRIMARY KEY</span>,
+  produk_id <span class="kw">INT</span>,
+  jumlah <span class="kw">INT</span>,
+  <span class="kw">FOREIGN KEY</span> (produk_id) <span class="kw">REFERENCES</span> produk(id)
+);
+
+<span class="kw">INSERT INTO</span> produk (nama_produk, harga) <span class="kw">VALUES</span>
+(<span class="str">'Roti Coklat'</span>, <span class="num">8000</span>),
+(<span class="str">'Kopi Susu'</span>, <span class="num">12000</span>);
+
+<span class="kw">INSERT INTO</span> penjualan (produk_id, jumlah) <span class="kw">VALUES</span>
+(<span class="num">1</span>, <span class="num">3</span>),
+(<span class="num">2</span>, <span class="num">5</span>);</code></pre>
+      </div>
+
+      <p>Sekarang, coba cari tahu: <b>total pendapatan dari tiap produk</b>.</p>
+
+      <div class="codewrap">
+        <div class="codebar"><span>laporan.sql</span><div class="dots"><span></span><span></span><span></span></div></div>
+        <pre><code><span class="kw">SELECT</span> produk.nama_produk,
+       penjualan.jumlah,
+       (produk.harga * penjualan.jumlah) <span class="kw">AS</span> total
+<span class="kw">FROM</span> penjualan
+<span class="kw">JOIN</span> produk <span class="kw">ON</span> penjualan.produk_id = produk.id;</code></pre>
+      </div>
+
+      <div class="box hasil">
+        <div class="box-title"><span class="mascot">✅</span> Hasilnya</div>
+        <table class="datatbl">
+          <tr><th>nama_produk</th><th>jumlah</th><th>total</th></tr>
+          <tr><td>Roti Coklat</td><td>3</td><td>24000</td></tr>
+          <tr><td>Kopi Susu</td><td>5</td><td>60000</td></tr>
+        </table>
+      </div>
+
+      <div class="box hasil">
+        <div class="box-title"><span class="mascot">🎉</span> Selamat!</div>
+        Query di atas menggabungkan hampir semua yang sudah kamu pelajari: dua tabel
+        yang berelasi, <code>JOIN</code>, perhitungan manual di dalam
+        <code>SELECT</code>, dan pemberian nama kolom pakai <code>AS</code>. Ini
+        persis pola yang dipakai laporan penjualan di toko-toko online sungguhan.
+      </div>
+
+      <div class="lesson-nav"><a href="#join">← Balik: Gabungin tabel</a><a href="#penutup">Lanjut: Penutup →</a></div>
+    </section>
+
+    <!-- 15 -->
+    <section class="lesson" id="penutup">
+      <div class="eyebrow">Bab 15</div>
+      <h2>Sudah sampai sini, lanjut ke mana? 🌱</h2>
+      <p class="subtitle">Kamu sekarang sudah bisa "ngobrol" beneran sama database.</p>
+
+      <div class="box hasil">
+        <div class="box-title"><span class="mascot">🏁</span> Yang sudah kamu kuasai</div>
+        Membuat tabel, memasukkan data, menampilkan &amp; menyaring data, mengurutkan
+        &amp; membatasi hasil, mengubah &amp; menghapus data dengan aman, filter
+        lanjutan (AND/OR/LIKE/IN/BETWEEN), fungsi hitung otomatis (COUNT/SUM/AVG),
+        sampai menggabungkan tabel dengan JOIN. Ini adalah fondasi SQL yang lengkap
+        untuk kebutuhan sehari-hari.
+      </div>
+
+      <h3>Langkah selanjutnya yang disarankan:</h3>
+      <ol>
+        <li>Balik lagi ke project Sistem Informasi Data Siswa dari seri PHP, coba
+        modifikasi query-nya pakai teknik yang baru kamu pelajari di sini
+        (misalnya tambahkan pencarian pakai <code>LIKE</code>).</li>
+        <li>Coba bikin sendiri database dengan topik lain, misalnya database
+        perpustakaan (buku, anggota, peminjaman) lengkap dengan relasi antar tabelnya.</li>
+        <li>Pelajari jenis-jenis <code>JOIN</code> lain (<code>LEFT JOIN</code>,
+        <code>RIGHT JOIN</code>) setelah nyaman dengan <code>JOIN</code> dasar.</li>
+        <li>Pelajari <code>INDEX</code> untuk mempercepat pencarian data ketika
+        tabelnya sudah berisi ribuan baris.</li>
+      </ol>
+
+      <div class="box tip">
+        <div class="box-title"><span class="mascot">💬</span> Pesan terakhir dari Kak SQL</div>
+        SQL itu salah satu skill yang paling "abadi" di dunia teknologi — dipakai
+        di hampir semua aplikasi, dari yang kecil sampai yang raksasa. Begitu kamu
+        paham SELECT, WHERE, dan JOIN dengan baik, kamu sudah punya modal yang
+        dipakai jutaan developer di seluruh dunia setiap hari. Pelan-pelan aja,
+        kamu sudah jalan jauh. 🌟
+      </div>
+    </section>
+
+    <footer>Belajar SQL dari Nol — pelengkap seri "Belajar PHP dari Nol", pelan-pelan aja, nggak perlu buru-buru. 🐣</footer>
+  </main>
+</div>
+
+<script>
+  const links = Array.from(document.querySelectorAll('#toc a'));
+  const sections = links.map(l => document.querySelector(l.getAttribute('href')));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = '#' + entry.target.id;
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === id));
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+  sections.forEach(s => { if (s) observer.observe(s); });
+</script>
+
+</body>
+</html>
